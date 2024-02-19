@@ -17,8 +17,9 @@ const getPostById = (req, res, next) => {
 
 const createPost = (req, res) => {
     let posts = getPosts.getAllPosts();
-    let lengthP = posts.length;
-    let id = lengthP + 1;
+    let lengthP=posts.length;
+    let getId=posts[lengthP-1].id;
+    let id=getId+1;
     let { title, desc } = req.body;
     getPosts.createPost({ id, title, desc })
     res.send(posts)
