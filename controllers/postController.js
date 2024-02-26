@@ -17,27 +17,28 @@ const getPostById = (req, res, next) => {
 
 const createPost = (req, res) => {
     let posts = getPosts.getAllPosts();
-    let lengthP=posts.length;
-    let getId=posts[lengthP-1].id;
-    let id=getId+1;
+    let lengthP = posts.length;
+    let getId = posts[lengthP - 1].id;
+    let id = getId + 1;
     let { title, desc } = req.body;
     getPosts.createPost({ id, title, desc })
+    posts.push(({ id, title, desc }))
     res.send(posts)
 };
 
-const updatePost = (req, res,next) => {
-    try{
+const updatePost = (req, res, next) => {
+    try {
         let id = req.params.id
         let { title, desc } = req.body;
         getPosts.updatePost(title, desc, id)
         res.send(getPosts.getAllPosts());
-    }catch{
+    } catch {
         const err = new Error('post not found');
         next(err)
     }
 };
 
-const deletePost = (req, res,next) => {
+const deletePost = (req, res, next) => {
     let myPost = getPosts.getPostById(req.params.id)
     if (myPost) {
         getPosts.deletePost(req.params.id);

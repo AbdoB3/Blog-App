@@ -28,10 +28,9 @@ const updatePost = (title, desc, id) => {
 
 const deletePost = (id) => {
     let posts = getAllPosts();
-    let myPost = posts.find(post => post.id == id)
+    let myPost = getPostById(id)
     posts.splice(posts.indexOf(myPost, 0), 1)
     fs.writeFileSync('./posts.json', JSON.stringify(posts))
 }
-
 
 module.exports = { getAllPosts, getPostById, createPost, updatePost, deletePost };
