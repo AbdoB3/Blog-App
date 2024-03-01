@@ -13,8 +13,9 @@ router.use(authenticateUser);
 router.use(logs)
 
 router.post('/',createPost)
-router.put('/:id',updatePost)
+router.put('/update',updatePost)
 router.delete('/:id',authorize('admin'),deletePost)
+
 
 
 module.exports=router

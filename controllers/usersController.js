@@ -1,4 +1,4 @@
-const getUsers = require('../models/users');
+const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
@@ -6,56 +6,43 @@ const jwt = require('jsonwebtoken');
 
 
 const getAllUsers = (req, res) => {
-    const users = getUsers.getAllUsers();
-    res.send(users);
+    User.find()
+        .then((users) => res.json(users))
+        .catch(err => console.log('error ', err))
 }
 
 
 const registration = async (req, res) => {
     try {
-        let users = getUsers.getAllUsers();
-        let lengthU = users.length;
-        let id;
-        if(lengthU==0){
-            id=1
-        }else{
-            let getId = users[lengthU - 1].id;
-            id = parseInt(getId) + 1;
-        }
-
-        console.log('pass', req.body.password)
         const salt = await bcrypt.genSalt(saltRounds);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
-        
-        getUsers.registration({ 'id': id, 'username': req.body.username, 'password': hashedPassword ,'role':'user'})
-        users.push({ 'id': id, 'username': req.body.username, 'password': hashedPassword ,'role':'user'});
-        res.json(users)
+        let user = new User({ 'username': req.body.username, 'password': hashedPassword })
+        let savedUser = await user.save()
+        res.json(savedUser)
     } catch (err) {
         console.log('catch err: ', err)
     }
 };
 
 const login = async (req, res) => {
-    let users = getUsers.getAllUsers();
-    let user = users.find(u => u.username === req.body.username)
-    const match = await bcrypt.compare(req.body.password, user.password);
-    if (!user) {
+    let userLogin = await User.findOne({ username: req.body.username })
+    const match = await bcrypt.compare(req.body.password, userLogin.password);
+    if (!userLogin) {
         res.send('erro')
     }
     if (!match) {
         res.status(402).send("Incort password")
     }
-    const token = jwt.sign({ user: user.id, role: user.role }, 'secret_key', { expiresIn: '1m' });
+    const token = jwt.sign({ user: userLogin.id, role: userLogin.role }, 'secret_key', { expiresIn: '2h' });
     res.json(token)
 }
 
-const logout = (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Error destroying session:', err);
-      }
-      res.redirect('/post'); 
-    });
-  };
+const changeRole = async (req,res) => {
+    let userLogin = await User.findByIdAndUpdate(req.params.id,{role:req.body.role})
+    if(!userLogin){
+        return res.status(401).send('User not found')
+    }
+    res.send(userLogin)
+}
 
-module.exports = { getAllUsers, registration, login,logout }
+module.exports = { getAllUsers, registration, login, changeRole }

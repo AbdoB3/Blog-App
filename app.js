@@ -1,7 +1,25 @@
+require('dotenv').config();
 const express = require('express');
-const app = express()
+const app = express();
 const session = require('express-session');
 app.use(express.json());
+const mongoose = require('mongoose');
+
+
+const uri = process.env.MONGODB_URI;
+const port = process.env.PORT;
+
+
+
+mongoose
+  .connect(uri)
+  .then(() => {
+    console.log('Connected to database');
+  })
+  .catch((error) => {
+    console.log('Error connecting to database: ', error);
+  });
+
 
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -31,6 +49,6 @@ app.use((err, req, res, next) => {
     res.status(500).send('somthing brok!')
 })
 
-app.listen(3000, () => {
-    console.log('listening to pott 3000')
+app.listen(port, () => {
+    console.log('listening to port ',port)
 })

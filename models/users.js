@@ -1,16 +1,15 @@
-const fs = require('fs')
+const mongoose = require('mongoose');
 
 
-const getAllUsers = () => {
-    const users = JSON.parse(fs.readFileSync('./users.json', 'utf-8'))
-    return users
-}
+const userSchema = mongoose.Schema({
+    username: { type: String, required: true },
+    password: { type: String, required: true},
+    role: {type:String,default:'user'},
+},
+    { timestamps: true }
+);
+
+const User = mongoose.model('user',userSchema); 
 
 
-const registration = (data) => {
-    let users = getAllUsers();
-    users.push(data)
-    fs.writeFileSync('./users.json', JSON.stringify(users))
-}
-
-module.exports = { getAllUsers, registration};
+module.exports = User;
