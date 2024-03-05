@@ -28,10 +28,10 @@ const login = async (req, res) => {
     let userLogin = await User.findOne({ username: req.body.username })
     const match = await bcrypt.compare(req.body.password, userLogin.password);
     if (!userLogin) {
-        res.send('erro')
+       return res.send('erro')
     }
     if (!match) {
-        res.status(402).send("Incort password")
+       return res.status(402).send("Incort password")
     }
     const token = jwt.sign({ user: userLogin.id, role: userLogin.role }, 'secret_key', { expiresIn: '2h' });
     res.json(token)

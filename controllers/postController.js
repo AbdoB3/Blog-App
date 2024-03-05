@@ -1,15 +1,22 @@
 const Post = require('../models/post')
 
-const getAllPosts = (req, res) => {
-    Post.find()
-        .then((posts) => res.json(posts))
-        .catch(err => console.log('error ', err))
-};
 
-const getPostById = (req, res, next) => {
-    let postById = getPosts.getPostById(req.params.id)
+//Get Post By pagination
+const getAllPosts = (req, res) => {
+    const pageSize = 2;
+    const pageNumber = req.query.p;
+    Post.find()
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize)
+    .then(users =>res.json(users) )
+    .catch(err => console.log('error ', err))
+}; 
+
+//Get Post By pagination
+const getPostById = async (req, res, next) => {
+    let postById = await Post.findById(req.params.id)
     if (postById) {
-        res.send(postById)
+        res.json(postById)
     } else {
         const err = new Error('post not found');
         next(err)
@@ -32,8 +39,8 @@ const updatePost = async (req, res, next) => {
         if (!updatedPost) {
             return res.status(404).json('post not found')
         }
-        res.send(updatedPost);
 
+        res.send(updatedPost);
     } catch {
         const err = new Error('post not found');
         next(err)
